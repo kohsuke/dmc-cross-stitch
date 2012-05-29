@@ -1,0 +1,63 @@
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+        }
+        #schematic TD {
+            text-align: center;
+        }
+        #schematic.symbol {
+            color: transparent;
+        }
+
+        div#legend {
+            float: right;
+        }
+
+        UL.items {
+            list-style: none;
+        }
+
+        div.sample {
+            display: inline-block;
+            height: 1em;
+            width: 1em;
+        }
+
+        div.letter {
+            display: inline-block;
+            height: 1em;
+            width: 1em;
+            text-align: center;
+        }
+    </style>
+    <style>
+        ${styles}
+    </style>
+    <script type="text/javascript">
+        function mode(name) {
+            $("#schematic").toggleClass(name)
+        }
+    </script>
+</head>
+<body>
+    <div id=legend>
+        <div>
+            <h3>Floss</h3>
+            <ul class=items>
+                ${items}
+            </ul>
+        </div>
+        <div>
+            <h3>Display mode</h3>
+            <button onclick="mode('color')">Color</button>
+            <button onclick="mode('symbol')">Symbols</button>
+        </div>
+    </div>
+    <table border=1 style='border-collapse:collapse' id=schematic>
+        ${schematic}
+    </table>
+</body>
+</html>

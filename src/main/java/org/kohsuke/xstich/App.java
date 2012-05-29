@@ -1,5 +1,6 @@
 package org.kohsuke.xstich;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.sanselan.color.ColorCIELab;
 import org.apache.sanselan.color.ColorConversions;
 import org.kohsuke.xstich.ColorPalette.Entry;
@@ -24,10 +25,12 @@ public class App {
         int pixels;
         final Entry color;
         final char letter;
+        final int index;
 
-        private Use(Entry color, char letter) {
+        private Use(Entry color, int index) {
             this.color = color;
-            this.letter = letter;
+            this.letter = SYMBOLS.charAt(index);
+            this.index = index;
         }
 
         public int compareTo(Use that) {
@@ -37,6 +40,12 @@ public class App {
         public String toRGB() {
             return String.format("rgb(%d,%d,%d)",color.rgb.getRed(), color.rgb.getGreen(), color.rgb.getBlue());
         }
+
+        private static final String SYMBOLS = "　＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％";
+
+        public void formatCellStyle(StringBuilder o) {
+            o.append(String.format("#schematic.color TD.c%d { background-color:%s; }\n", index, toRGB()));
+        }
     }
     
     public static void main(String[] args) throws Exception {
@@ -45,18 +54,13 @@ public class App {
         
         BufferedImage img = ImageIO.read(new File(args[0]));
         BufferedImage out = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        
-        StringBuilder schematic = new StringBuilder();
-        schematic.append("<html><style>");
-        schematic.append(".schematic TD { text-align:center; }\n");
-        schematic.append("div.sample { display: inline-block; height:1em; width:1em; }\n");
-        schematic.append("div.letter { display: inline-block; height:1em; width:1em; }\n");
-        schematic.append("</style><body style='font-family:monospace'>");
 
-        StringBuilder table = new StringBuilder();
-        table.append("<table border=1 style='border-collapse:collapse' class=schematic>");
+        String template = IOUtils.toString(App.class.getResourceAsStream("/output.html"));
+
+        StringBuilder schematic = new StringBuilder();
+        StringBuilder styles = new StringBuilder();
         for (int y=0; y<img.getHeight(); y++) {
-            table.append("<tr>");
+            schematic.append("<tr>");
             for (int x=0; x<img.getWidth(); x++) {
                 Color c = new Color(img.getRGB(x,y));
                 c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
@@ -65,39 +69,36 @@ public class App {
                 out.setRGB(x,y,e.rgb.getRGB());
 
                 Use v = used.get(e);
-                if (v==null)
-                    used.put(e,v=new Use(e,SYMBOLS.charAt(used.size())));
+                if (v==null) {
+                    used.put(e,v=new Use(e,used.size()));
+                    v.formatCellStyle(styles);
+                }
                 v.pixels++;
 
-                table.append("<td>").append(v.letter).append("</td>");
+                schematic.append("<td class=c" + v.index + ">").append(v.letter).append("</td>");
             }
             
-            table.append("</tr>");
+            schematic.append("</tr>");
         }
-        table.append("</table>");
+        template = template.replace("${schematic}", schematic).replace("${styles}",styles);
 
 
-        schematic.append("<table><tr><td>");
-        schematic.append(table);
-        schematic.append("</td><td>");
-        schematic.append("<div><ul>");
+        StringBuilder items = new StringBuilder();
         ArrayList<Use> usedList = new ArrayList<Use>(used.values());
         Collections.sort(usedList);
         for (Use use : usedList) {
-            schematic.append("<li>");
-            schematic.append(String.format("<div class=sample style='background-color:%s'></div>",use.toRGB()));
-            schematic.append(String.format("<div class=letter>%c</div>", use.letter));
-            schematic.append(String.format(" %4d  DMC:%-4s %s\n", use.pixels, use.color.dmcCode, use.color.name));
-            schematic.append("</li>");
+            items.append("<li>");
+            items.append(String.format("<div class=sample style='background-color:%s'></div>",use.toRGB()));
+            items.append(String.format("<div class=letter>%c</div>", use.letter));
+            items.append(String.format(" DMC:%-4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
+            items.append("</li>");
         }
-        schematic.append("</ul></div>");
-        schematic.append("</td></tr></table>");
-        schematic.append("</body></html>");
+        template = template.replace("${items}",items);
 
         ImageIO.write(out,"PNG",new File(args[0]+"-out.png"));
         File txt = new File(args[0] + ".html");
         FileWriter w = new FileWriter(txt);
-        w.write(schematic.toString());
+        w.write(template);
         w.close();
     }
 
@@ -119,6 +120,4 @@ public class App {
     private static ColorCIELab convertRGBtoCIELab(int rgb) {
         return ColorConversions.convertXYZtoCIELab(ColorConversions.convertRGBtoXYZ(rgb));
     }
-    
-    private static final String SYMBOLS = "　＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％";
 }
