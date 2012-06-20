@@ -81,6 +81,7 @@ public class App {
             schematic.append("</tr>");
         }
         template = template.replace("${schematic}", schematic).replace("${styles}",styles);
+        template = template.replace("${size}", String.format("%dw x %dh", img.getWidth(), img.getHeight()));
 
 
         StringBuilder items = new StringBuilder();
@@ -90,7 +91,7 @@ public class App {
             items.append("<li>");
             items.append(String.format("<div class=sample style='background-color:%s'></div>",use.toRGB()));
             items.append(String.format("<div class=letter>%c</div>", use.letter));
-            items.append(String.format(" DMC:%-4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
+            items.append(String.format(" DMC:%4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
             items.append("</li>");
         }
         template = template.replace("${items}",items);
