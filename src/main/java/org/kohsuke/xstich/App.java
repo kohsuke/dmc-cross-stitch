@@ -76,7 +76,7 @@ public class App {
         for (int y=0; y<img.getHeight(); y++) {
             schematic.append("<tr>");
             for (int x=0; x<img.getWidth(); x++) {
-                Color c = new Color(img.getRGB(x,y));
+                Color c = new Color(img.getRGB(x,y),true);
                 c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
 
                 Entry e = dmc.findNearest(c.getRGB()&0xFFFFFF);
