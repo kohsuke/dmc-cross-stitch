@@ -17,14 +17,25 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Hello world!
  *
  */
 public class App {
     private static class Use implements Comparable<Use> {
+        /**
+         * Number of pixesl in this color.
+         */
         int pixels;
+        /**
+         * Entry in the color palette.
+         */
         final Entry color;
+        /**
+         * Symbol we use in the schematics.
+         */
         final char letter;
+        /**
+         * Unique sequence number assigned to {@link Use}s
+         */
         final int index;
 
         private Use(Entry color, int index) {
@@ -33,6 +44,9 @@ public class App {
             this.index = index;
         }
 
+        /**
+         * Sort by the dominant color first.
+         */
         public int compareTo(Use that) {
             return that.pixels-this.pixels;
         }
