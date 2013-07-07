@@ -55,7 +55,7 @@ public class App {
             return String.format("rgb(%d,%d,%d)",color.rgb.getRed(), color.rgb.getGreen(), color.rgb.getBlue());
         }
 
-        private static final String SYMBOLS = "　＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％";
+        private static final String SYMBOLS = "＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％";
 
         public void formatCellStyle(StringBuilder o) {
             o.append(String.format("#schematic.color TD.c%d { background-color:%s; }\n", index, toRGB()));
@@ -77,6 +77,13 @@ public class App {
             schematic.append("<tr>");
             for (int x=0; x<img.getWidth(); x++) {
                 Color c = new Color(img.getRGB(x,y),true);
+
+                if (c.getAlpha()<128) {
+                    // treat this as transparent
+                    schematic.append("<td>　</td>");
+                    continue;
+                }
+
                 c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
 
                 Entry e = dmc.findNearest(c.getRGB()&0xFFFFFF);
