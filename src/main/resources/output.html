@@ -50,6 +50,11 @@
         function mode(name) {
             $("#schematic").toggleClass(name)
         }
+        $(function() {
+            $("li[index]").click(function (e) {
+                mode("c"+this.getAttribute('index'));
+            });
+        });
     </script>
 </head>
 <body>

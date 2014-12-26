@@ -55,10 +55,11 @@ public class App {
             return String.format("rgb(%d,%d,%d)",color.rgb.getRed(), color.rgb.getGreen(), color.rgb.getBlue());
         }
 
-        private static final String SYMBOLS = "＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％";
+        private static final String SYMBOLS = "＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％●○◎／ABX￥";
 
         public void formatCellStyle(StringBuilder o) {
             o.append(String.format("#schematic.color TD.c%d { background-color:%s; }\n", index, toRGB()));
+            o.append(String.format("#schematic.c%d TD.c%d { color:white; background-color: red; }\n", index, index));
         }
     }
     
@@ -109,7 +110,7 @@ public class App {
         ArrayList<Use> usedList = new ArrayList<Use>(used.values());
         Collections.sort(usedList);
         for (Use use : usedList) {
-            items.append("<li>");
+            items.append(String.format("<li index='%d'>", use.index));
             items.append(String.format("<div class=sample style='background-color:%s'></div>",use.toRGB()));
             items.append(String.format("<div class=letter>%c</div>", use.letter));
             items.append(String.format(" DMC:%4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
