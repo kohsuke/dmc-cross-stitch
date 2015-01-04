@@ -10,9 +10,14 @@
         }
         #schematic TD {
             text-align: center;
+            -webkit-print-color-adjust: exact;
         }
         #schematic.symbol {
             color: transparent;
+        }
+
+        #legend.hidden {
+            display: none;
         }
 
         div#legend {
@@ -37,7 +42,7 @@
         }
     </style>
     <style type="text/css" media="print">
-        #control {
+        .control {
             display: none;
         }
     </style>
@@ -58,6 +63,9 @@
     </script>
 </head>
 <body>
+    <div style="float:right" class='control'>
+        <button onclick="$('#legend').toggleClass('hidden')">Legend</button>
+    </div>
     <div id=legend>
         <div>
             <h3>Floss</h3>
@@ -65,7 +73,7 @@
                 ${items}
             </ul>
         </div>
-        <div id=control>
+        <div class='control'>
             <h3>Display mode</h3>
             <button onclick="mode('color')">Color</button>
             <button onclick="mode('symbol')">Symbols</button>
