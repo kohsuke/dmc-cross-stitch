@@ -22,5 +22,5 @@ public interface OrderedDitheringAlgorithm {
      * @param y
      *      Location of the pixel to be mapped.
      */
-    Entry map(Color c, int x, int y);
+    Entry map(ColorPalette palette, Color c, int x, int y);
 }

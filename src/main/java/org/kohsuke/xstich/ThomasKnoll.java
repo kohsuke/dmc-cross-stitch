@@ -11,8 +11,6 @@ import java.util.Comparator;
  * @see <a href="http://bisqwit.iki.fi/story/howto/dither/jy/">reference</a>
  */
 public class ThomasKnoll implements OrderedDitheringAlgorithm {
-    public final ColorPalette palette;
-
     /**
      * How much of the error should be propagated? [0,1] with 0 being no dithering and
      * 1 being lot of dithering
@@ -21,12 +19,11 @@ public class ThomasKnoll implements OrderedDitheringAlgorithm {
 
     private final BayerMatrix bayer;
 
-    public ThomasKnoll(ColorPalette palette, BayerMatrix bayer) {
-        this.palette = palette;
+    public ThomasKnoll(BayerMatrix bayer) {
         this.bayer = bayer;
     }
 
-    public Entry map(Color c, int x, int y) {
+    public Entry map(ColorPalette palette, Color c, int x, int y) {
         Vector in = new Vector(c);
 
         Entry[] candidates = new Entry[bayer.size*bayer.size];

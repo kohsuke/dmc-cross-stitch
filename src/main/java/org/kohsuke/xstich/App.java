@@ -24,10 +24,12 @@ import java.util.Map;
  */
 public class App {
     @Option(name="-p",usage="Color palette to use")
-    public String palette = "dmc-floss";
+    public String paletteName = "dmc-floss";
 
     @Argument(required=true)
     public File input;
+
+    public OrderedDitheringAlgorithm dither = new NearestColor();
 
     public static void main(String[] args) throws Exception {
         App app = new App();
@@ -42,7 +44,7 @@ public class App {
     }
 
     public void run() throws Exception {
-        ColorPalette dmc = new ColorPalette(palette);
+        ColorPalette palette = new ColorPalette(paletteName);
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
         
         BufferedImage img = ImageIO.read(input);
@@ -65,7 +67,7 @@ public class App {
 
                 c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
 
-                Entry e = dmc.findNearest(c);
+                Entry e = dither.map(palette,c,x,y);
                 out.setRGB(x,y,e.rgb.getRGB());
 
                 Use v = used.get(e);
