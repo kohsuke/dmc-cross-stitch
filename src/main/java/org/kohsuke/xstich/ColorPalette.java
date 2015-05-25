@@ -48,8 +48,8 @@ public class ColorPalette {
     
     final List<Entry> entries = new ArrayList<Entry>();
     
-    public ColorPalette() throws IOException {
-        CSVReader csv = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/dmc-floss.csv")));
+    public ColorPalette(String name) throws IOException {
+        CSVReader csv = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/"+ name +".csv")));
         csv.readNext(); // first line is caption
         
         while (true) {

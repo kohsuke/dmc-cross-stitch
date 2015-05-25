@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -64,7 +63,7 @@ public class App {
     }
     
     public static void main(String[] args) throws Exception {
-        ColorPalette dmc = new ColorPalette();
+        ColorPalette dmc = new ColorPalette("dmc-floss");
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
         
         BufferedImage img = ImageIO.read(new File(args[0]));
