@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -29,7 +30,25 @@ public class App {
     @Argument(required=true)
     public File input;
 
+    @Option(name="-b",usage="Select Bayer matrix size from [2,3,4]")
+    public int bayerSize = 4;
+
+
     public OrderedDitheringAlgorithm dither = new NearestColor();
+
+    @Option(name="-ctk",usage="Composite Thomas Knoll")
+    public void useCompositeThomasKnoll(File mask) throws IOException {
+        dither = new CompositeDither(
+            new ThomasKnoll(new BayerMatrix(bayerSize)),
+            new NearestColor(),
+            ImageIO.read(mask)
+        );
+    }
+
+    @Option(name="-tk",usage="Thomas Knoll")
+    public void useThomasKnoll() throws IOException {
+        dither = new ThomasKnoll(new BayerMatrix(bayerSize));
+    }
 
     public static void main(String[] args) throws Exception {
         App app = new App();
