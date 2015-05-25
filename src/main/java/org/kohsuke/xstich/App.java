@@ -3,6 +3,10 @@ package org.kohsuke.xstich;
 import org.apache.commons.io.IOUtils;
 import org.apache.sanselan.color.ColorCIELab;
 import org.apache.sanselan.color.ColorConversions;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 import org.kohsuke.xstich.ColorPalette.Entry;
 
 import javax.imageio.ImageIO;
@@ -19,11 +23,29 @@ import java.util.Map;
  *
  */
 public class App {
+    @Option(name="-p",usage="Color palette to use")
+    public String palette = "dmc-floss";
+
+    @Argument(required=true)
+    public File input;
+
     public static void main(String[] args) throws Exception {
-        ColorPalette dmc = new ColorPalette("dmc-floss");
+        App app = new App();
+        CmdLineParser p = new CmdLineParser(app);
+        try {
+            p.parseArgument(args);
+            app.run();
+        } catch (CmdLineException e) {
+            System.err.println(e.getMessage());
+            p.printUsage(System.err);
+        }
+    }
+
+    public void run() throws Exception {
+        ColorPalette dmc = new ColorPalette(palette);
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
         
-        BufferedImage img = ImageIO.read(new File(args[0]));
+        BufferedImage img = ImageIO.read(input);
         BufferedImage out = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
         String template = IOUtils.toString(App.class.getResourceAsStream("/output.html"));
@@ -74,8 +96,8 @@ public class App {
         }
         template = template.replace("${items}",items);
 
-        ImageIO.write(out,"PNG",new File(args[0]+"-out.png"));
-        File txt = new File(args[0] + ".html");
+        ImageIO.write(out,"PNG",new File(input.getPath()+"-out.png"));
+        File txt = new File(input.getPath() + ".html");
         FileWriter w = new FileWriter(txt);
         w.write(template);
         w.close();
