@@ -27,7 +27,7 @@ class Use implements Comparable<Use> {
 
     Use(Entry color, int index) {
         this.color = color;
-        this.letter = SYMBOLS.charAt(index);
+        this.letter = (SYMBOLS.length()>index) ? SYMBOLS.charAt(index) : ' ';
         this.index = index;
     }
 

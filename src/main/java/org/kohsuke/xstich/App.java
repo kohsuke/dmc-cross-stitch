@@ -46,7 +46,7 @@ public class App {
     }
 
     @Option(name="-tk",usage="Thomas Knoll")
-    public void useThomasKnoll() throws IOException {
+    public void useThomasKnoll(boolean v) throws IOException {
         dither = new ThomasKnoll(new BayerMatrix(bayerSize));
     }
 
@@ -112,7 +112,7 @@ public class App {
             items.append(String.format("<li index='%d'>", use.index));
             items.append(String.format("<div class=sample style='background-color:%s'></div>",use.toRGB()));
             items.append(String.format("<div class=letter>%c</div>", use.letter));
-            items.append(String.format(" DMC:%4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
+            items.append(String.format(" %4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
             items.append("</li>");
         }
         template = template.replace("${items}",items);
