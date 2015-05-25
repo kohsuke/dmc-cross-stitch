@@ -8,17 +8,29 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * Color palette, which consists of a fixed number of {@link Entry}s that represent available colors.
+ *
  * @author Kohsuke Kawaguchi
  */
 public class ColorPalette {
+    /**
+     * A color in a palette.
+     */
     public class Entry {
+        /**
+         * Color name by the vendor.
+         */
         String name;
         Color rgb;
         ColorCIELab cie;
         String dmcCode;
 
+        /**
+         * Computes CIE color distance.
+         */
         public double distance(ColorCIELab that) {
             return sq(this.cie.L-that.L)
                 +  sq(this.cie.a-that.a)
@@ -30,7 +42,7 @@ public class ColorPalette {
         }
     }
     
-    java.util.List<Entry> entries = new ArrayList<Entry>();
+    final List<Entry> entries = new ArrayList<Entry>();
     
     public ColorPalette() throws IOException {
         CSVReader csv = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/dmc-floss.csv")));
