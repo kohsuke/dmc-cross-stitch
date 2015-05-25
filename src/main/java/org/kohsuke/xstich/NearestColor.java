@@ -17,6 +17,6 @@ public class NearestColor implements OrderedDitheringAlgorithm {
     }
 
     public Entry map(Color c, int x, int y) {
-        return palette.findNearest(c.getRGB()&0xFFFFFF);
+        return palette.findNearest(c);
     }
 }

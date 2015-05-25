@@ -36,6 +36,10 @@ public class ColorPalette {
                 +  sq(this.cie.a-that.a)
                 +  sq(this.cie.b-that.b);
         }
+
+        public double getLumacity() {
+            return 0.299*rgb.getRed() + 0.587*rgb.getGreen() + 0.114*rgb.getBlue();
+        }
         
         private double sq(double d) {
             return d*d;
@@ -64,7 +68,11 @@ public class ColorPalette {
     private int n(String s) {
         return Integer.parseInt(s);
     }
-    
+
+    public Entry findNearest(Color c) {
+        return findNearest(c.getRGB()&0xFFFFFF);
+    }
+
     public Entry findNearest(int rgb) {
         ColorCIELab cie = convertRGBtoCIELab(rgb);
         double best=Double.MAX_VALUE;

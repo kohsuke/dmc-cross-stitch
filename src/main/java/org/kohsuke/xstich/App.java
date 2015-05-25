@@ -87,7 +87,7 @@ public class App {
 
                 c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
 
-                Entry e = dmc.findNearest(c.getRGB()&0xFFFFFF);
+                Entry e = dmc.findNearest(c);
                 out.setRGB(x,y,e.rgb.getRGB());
 
                 Use v = used.get(e);
