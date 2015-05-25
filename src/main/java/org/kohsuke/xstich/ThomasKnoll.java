@@ -19,20 +19,17 @@ public class ThomasKnoll implements OrderedDitheringAlgorithm {
      */
     private final double threshold = 0.5;
 
-    private final int bayerSize;
+    private final BayerMatrix bayer;
 
-    private final int[] bayerMatrix;
-
-    public ThomasKnoll(ColorPalette palette, int bayerSize) {
+    public ThomasKnoll(ColorPalette palette, BayerMatrix bayer) {
         this.palette = palette;
-        this.bayerSize = bayerSize;
-        this.bayerMatrix = BayerMatrix.ALL[bayerSize];
+        this.bayer = bayer;
     }
 
     public Entry map(Color c, int x, int y) {
         Vector in = new Vector(c);
 
-        Entry[] candidates = new Entry[bayerMatrix.length];
+        Entry[] candidates = new Entry[bayer.size*bayer.size];
 
         Vector err = Vector.ZERO;
         for (int i=0; i<candidates.length; i++) {
@@ -54,7 +51,6 @@ public class ThomasKnoll implements OrderedDitheringAlgorithm {
         });
 
         // select the target color
-        int idx = (y%bayerSize)*bayerSize + (x%bayerSize);
-        return candidates[idx];
+        return candidates[bayer.asIndex(x,y)];
     }
 }
