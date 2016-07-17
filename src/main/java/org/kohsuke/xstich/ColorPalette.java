@@ -3,6 +3,7 @@ package org.kohsuke.xstich;
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.sanselan.color.ColorCIELab;
 import org.apache.sanselan.color.ColorConversions;
+import org.apache.sanselan.color.ColorHSV;
 
 import java.awt.*;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static org.apache.sanselan.color.ColorConversions.convertRGBtoHSV;
 
 /**
  * Color palette, which consists of a fixed number of {@link Entry}s that represent available colors.
@@ -27,6 +30,7 @@ public class ColorPalette {
         String name;
         Color rgb;
         ColorCIELab cie;
+        ColorHSV hsv;
         String dmcCode;
 
         /**
@@ -66,6 +70,7 @@ public class ColorPalette {
             e.name = line[1];
             e.rgb = new Color(n(line[2]),n(line[3]),n(line[4]));
             e.cie = convertRGBtoCIELab(e.rgb.getRGB());
+            e.hsv = convertRGBtoHSV(e.rgb.getRGB());
             if (!exclusions.contains(e.dmcCode))
                 entries.add(e);
         }

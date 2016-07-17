@@ -187,10 +187,6 @@ public class App {
 
             schematic.append("</tr>");
         }
-        template = template.replace("${schematic}", schematic).replace("${styles}",styles);
-        template = template.replace("${size}", String.format("%dw x %dh", img.getWidth(), img.getHeight()));
-        template = template.replace("${width}", String.valueOf(img.getWidth()));
-
 
         StringBuilder items = new StringBuilder();
         ArrayList<Use> usedList = new ArrayList<Use>(used.values());
@@ -201,9 +197,19 @@ public class App {
             items.append(String.format("<div class=letter>%c</div>", use.letter));
             items.append(String.format(" %4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
             items.append("</li>");
-        }
-        template = template.replace("${items}",items);
 
+            // specify black or white text color for each cell
+            styles.append(String.format("#schematic td.c%d { color:%s } #schematic.symbol td.c%d { color:transparent; }",
+                    use.index,
+                    use.color.hsv.V<=0.5?"#fff":"#000",
+                    use.index));
+        }
+
+        template = template.replace("${items}",items);
+        template = template.replace("${schematic}", schematic);
+        template = template.replace("${styles}",styles);
+        template = template.replace("${size}", String.format("%dw x %dh", img.getWidth(), img.getHeight()));
+        template = template.replace("${width}", String.valueOf(img.getWidth()));
         template = template.replace("${cmdLine}",cmdLine);
 
         return new Result(template,used,out);
