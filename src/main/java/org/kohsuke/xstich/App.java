@@ -189,6 +189,7 @@ public class App {
         }
 
         StringBuilder items = new StringBuilder();
+        StringBuilder colors = new StringBuilder();
         ArrayList<Use> usedList = new ArrayList<Use>(used.values());
         Collections.sort(usedList);
         for (Use use : usedList) {
@@ -203,6 +204,7 @@ public class App {
                     use.index,
                     use.color.hsv.V<=0.5?"#fff":"#000",
                     use.index));
+            colors.append(use.color.dmcCode).append('\n');
         }
 
         template = template.replace("${items}",items);
@@ -211,6 +213,7 @@ public class App {
         template = template.replace("${size}", String.format("%dw x %dh", img.getWidth(), img.getHeight()));
         template = template.replace("${width}", String.valueOf(img.getWidth()));
         template = template.replace("${cmdLine}",cmdLine);
+        template = template.replace("${colors}",colors);
 
         return new Result(template,used,out);
     }
