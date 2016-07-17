@@ -42,7 +42,7 @@ class Use implements Comparable<Use> {
         return String.format("rgb(%d,%d,%d)",color.rgb.getRed(), color.rgb.getGreen(), color.rgb.getBlue());
     }
 
-    private static final String SYMBOLS = "＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％●○◎／ABX￥";
+    private static final String SYMBOLS = "＋Ｅー＊＃・＜□◇＝｜×ＺＮ∥％●○◎／ABX￥CDFHJKLMPRSTU";
 
     public void formatCellStyle(StringBuilder o) {
         o.append(String.format("#schematic.color TD.c%d { background-color:%s; }\n", index, toRGB()));
