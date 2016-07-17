@@ -20,7 +20,7 @@ public class ColorPalette {
     /**
      * A color in a palette.
      */
-    public class Entry {
+    public static class Entry {
         /**
          * Color name by the vendor.
          */
