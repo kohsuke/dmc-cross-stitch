@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +35,16 @@ public class App {
      */
     @Option(name="-e",usage="Code of excluded colors, comma separated")
     public String exclude;
+
+    /**
+     * Two-path color exclusion. Assign colors once to produce a small color palette, then
+     * exclude these colors from that palette and rerun the algorithm again. The net effect
+     * is that the colors specified here gets re-mapped to other existing colors.
+     *
+     * Useful for removing colors that are only used in a few pixels.
+     */
+    @Option(name="-2e",usage="Code of excluded colors, comma separated")
+    public String twoPhaseExclude;
 
     @Argument(required=true)
     public File input;
@@ -76,10 +87,60 @@ public class App {
     }
 
     public void run() throws Exception {
-        ColorPalette palette = new ColorPalette(paletteName,getExcludedColorCodes());
-        Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
-        
         BufferedImage img = ImageIO.read(input);
+        ColorPalette p = new ColorPalette(paletteName, getExcludedColorCodes());
+        Result r = apply(img, p);
+
+        if (twoPhaseExclude!=null) {
+            // run the second phase
+            List<String> excluded = Arrays.asList(twoPhaseExclude.split(","));
+            List<Entry> secondColors = new ArrayList<Entry>();
+            for (Entry e : p.entries) {
+                if (!excluded.contains(e.dmcCode))
+                    secondColors.add(e);
+            }
+
+            r = apply(r.image,new ColorPalette(secondColors));
+        }
+
+        r.write();
+    }
+
+    /**
+     * Result of the color assignment.
+     */
+    class Result {
+        /**
+         * Use of colors in the output image.
+         */
+        final Map<Entry,Use> used;
+        /**
+         * Output image.
+         */
+        final BufferedImage image;
+        /**
+         * Schematic html
+         */
+        final String html;
+
+        public Result(String html, Map<Entry, Use> used, BufferedImage image) {
+            this.html = html;
+            this.used = used;
+            this.image = image;
+        }
+
+        public void write() throws IOException {
+            ImageIO.write(image,"PNG",new File(input.getPath()+"-out.png"));
+            File txt = new File(input.getPath() + ".html");
+            FileWriter w = new FileWriter(txt);
+            w.write(html);
+            w.close();
+        }
+    }
+
+    public Result apply(BufferedImage img, ColorPalette palette) throws IOException {
+        Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
+
         BufferedImage out = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
         String template = IOUtils.toString(App.class.getResourceAsStream("/output.html"));
@@ -111,7 +172,7 @@ public class App {
 
                 schematic.append("<td class=c" + v.index + ">").append(v.letter).append("</td>");
             }
-            
+
             schematic.append("</tr>");
         }
         template = template.replace("${schematic}", schematic).replace("${styles}",styles);
@@ -130,11 +191,7 @@ public class App {
         }
         template = template.replace("${items}",items);
 
-        ImageIO.write(out,"PNG",new File(input.getPath()+"-out.png"));
-        File txt = new File(input.getPath() + ".html");
-        FileWriter w = new FileWriter(txt);
-        w.write(template);
-        w.close();
+        return new Result(template,used,out);
     }
 
     /**
