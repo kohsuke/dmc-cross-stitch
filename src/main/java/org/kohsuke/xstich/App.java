@@ -1,6 +1,7 @@
 package org.kohsuke.xstich;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.sanselan.color.ColorCIELab;
 import org.apache.sanselan.color.ColorConversions;
 import org.kohsuke.args4j.Argument;
@@ -16,12 +17,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.*;
 
 /**
  *
@@ -55,6 +57,11 @@ public class App {
 
     public OrderedDitheringAlgorithm dither = new NearestColor();
 
+    /**
+     * Capture command line arguments so that the output have this information in comment.
+     */
+    private String cmdLine;
+
     @Option(name="-ctk",usage="Composite Thomas Knoll")
     public void useCompositeThomasKnoll(File mask) throws IOException {
         dither = new CompositeDither(
@@ -71,7 +78,7 @@ public class App {
 
     public Collection<String> getExcludedColorCodes() {
         if (exclude==null)  return Collections.emptySet();
-        return Arrays.asList(exclude.split(","));
+        return asList(exclude.split(","));
     }
 
     public static void main(String[] args) throws Exception {
@@ -79,6 +86,7 @@ public class App {
         CmdLineParser p = new CmdLineParser(app);
         try {
             p.parseArgument(args);
+            app.cmdLine = StringUtils.join(args," ");
             app.run();
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
@@ -93,9 +101,9 @@ public class App {
 
         if (twoPhaseExclude!=null) {
             // run the second phase
-            List<String> excluded = Arrays.asList(twoPhaseExclude.split(","));
+            List<String> excluded = asList(twoPhaseExclude.split(","));
             List<Entry> secondColors = new ArrayList<Entry>();
-            for (Entry e : p.entries) {
+            for (Entry e : r.used.keySet()) {
                 if (!excluded.contains(e.dmcCode))
                     secondColors.add(e);
             }
@@ -190,6 +198,8 @@ public class App {
             items.append("</li>");
         }
         template = template.replace("${items}",items);
+
+        template = template.replace("${cmdLine}",cmdLine);
 
         return new Result(template,used,out);
     }
