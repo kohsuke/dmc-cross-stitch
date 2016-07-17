@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,6 +28,12 @@ import java.util.Map;
 public class App {
     @Option(name="-p",usage="Color palette to use")
     public String paletteName = "dmc-floss";
+
+    /**
+     * Pretend as if these color codes were not a part of the color palette, and find the next best matching color.
+     */
+    @Option(name="-e",usage="Code of excluded colors, comma separated")
+    public String exclude;
 
     @Argument(required=true)
     public File input;
@@ -50,6 +58,11 @@ public class App {
         dither = new ThomasKnoll(new BayerMatrix(bayerSize));
     }
 
+    public Collection<String> getExcludedColorCodes() {
+        if (exclude==null)  return Collections.emptySet();
+        return Arrays.asList(exclude.split(","));
+    }
+
     public static void main(String[] args) throws Exception {
         App app = new App();
         CmdLineParser p = new CmdLineParser(app);
@@ -63,7 +76,7 @@ public class App {
     }
 
     public void run() throws Exception {
-        ColorPalette palette = new ColorPalette(paletteName);
+        ColorPalette palette = new ColorPalette(paletteName,getExcludedColorCodes());
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
         
         BufferedImage img = ImageIO.read(input);

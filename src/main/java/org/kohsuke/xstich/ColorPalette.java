@@ -8,6 +8,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,7 +49,7 @@ public class ColorPalette {
     
     final List<Entry> entries = new ArrayList<Entry>();
     
-    public ColorPalette(String name) throws IOException {
+    public ColorPalette(String name, Collection<String> exclusions) throws IOException {
         CSVReader csv = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/"+ name +".csv")));
         csv.readNext(); // first line is caption
         
@@ -61,7 +62,8 @@ public class ColorPalette {
             e.name = line[1];
             e.rgb = new Color(n(line[2]),n(line[3]),n(line[4]));
             e.cie = convertRGBtoCIELab(e.rgb.getRGB());
-            entries.add(e);
+            if (!exclusions.contains(e.dmcCode))
+                entries.add(e);
         }
     }
     
