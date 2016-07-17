@@ -48,7 +48,11 @@ public class ColorPalette {
     }
     
     final List<Entry> entries = new ArrayList<Entry>();
-    
+
+    public ColorPalette(Collection<Entry> entries) throws IOException {
+        this.entries.addAll(entries);
+    }
+
     public ColorPalette(String name, Collection<String> exclusions) throws IOException {
         CSVReader csv = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/"+ name +".csv")));
         csv.readNext(); // first line is caption
