@@ -181,10 +181,15 @@ public class App {
                 schematic.append("<td class=c" + v.index + ">").append(v.letter).append("</td>");
             }
 
+            if (y==0) {
+                schematic.append("<td rowspan=").append(img.getHeight()).append(" style=\"border:none\">◀</td>");
+            }
+
             schematic.append("</tr>");
         }
         template = template.replace("${schematic}", schematic).replace("${styles}",styles);
         template = template.replace("${size}", String.format("%dw x %dh", img.getWidth(), img.getHeight()));
+        template = template.replace("${width}", String.valueOf(img.getWidth()));
 
 
         StringBuilder items = new StringBuilder();

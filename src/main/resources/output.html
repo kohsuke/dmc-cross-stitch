@@ -7,10 +7,12 @@
         }
         #schematic {
             font-size: 50%;
+            border: none;
         }
         #schematic TD {
             text-align: center;
             -webkit-print-color-adjust: exact;
+            border: solid 1px #888;
         }
         #schematic.symbol {
             color: transparent;
@@ -81,6 +83,7 @@
     </div>
     <table border=1 style='border-collapse:collapse' id=schematic class="color">
         ${schematic}
+        <tr><td colspan=${width} style="border:none">▲</td></tr>
     </table>
     <div>
         ${size}
