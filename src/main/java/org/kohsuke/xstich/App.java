@@ -222,8 +222,6 @@ public class App {
                 return Math.max(w,h)+"x"+Math.min(w,h);
             }
         }
-        final List<Tile> tiles = Arrays.asList(new Tile(2,2),/*new Tile(2,1),new Tile(1,2),*/new Tile(1,1));
-
         for (int y=0; y<out.getHeight(); y++) {
             schematic.append("<tr>");
             for (int x=0; x<out.getWidth(); x++) {
@@ -248,6 +246,12 @@ public class App {
                         // this pixel was already filled by tiles earlier
                         continue;
                     }
+                    List<Tile> tiles = Arrays.asList(new Tile(2,2),new Tile(1,1));
+                    if (e.dmcCode.equals("DB")) {
+                        // HACK: dark blue 2x2 isn't available in any real quantity
+                        tiles = Arrays.asList(new Tile(3, 2), new Tile(2, 3),/*new Tile(2,1),new Tile(1,2),*/new Tile(1, 1));
+                    }
+
                     for (Tile tile : tiles) {
                         if (tile.fitsAt(x,y)) {
                             tile.place(x,y);
