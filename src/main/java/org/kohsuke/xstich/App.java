@@ -17,11 +17,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Arrays.*;
 
@@ -60,6 +63,8 @@ public class App {
     @Option(name="-area",handler=RectangleHandler.class)
     public Rectangle area;
 
+    @Option(name="-tile",usage="For LEGO. Fill the area by tiles")
+    public boolean tileFill;
 
     public OrderedDitheringAlgorithm dither = new NearestColor();
 
@@ -156,37 +161,105 @@ public class App {
     /**
      * Reduce image to the given color palette and produce color assignment.
      */
-    public Result apply(BufferedImage img, ColorPalette palette) throws IOException {
+    public Result apply(final BufferedImage img, final ColorPalette palette) throws IOException {
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
 
         BufferedImage out = new BufferedImage(area.width, area.height, BufferedImage.TYPE_4BYTE_ABGR);
 
         StringBuilder schematic = new StringBuilder();
         StringBuilder styles = new StringBuilder();
+
+        // used with -tileFill to remember areas that were filled
+        final BitSet filled = new BitSet(area.width*area.height);
+        /**
+         * Rectangular tile with which we try to fill the image.
+         */
+        final class Tile {
+            /**
+             * Dimension of the tile.
+             */
+            final int w,h;
+
+            Tile(int w, int h) {
+                this.w = w;
+                this.h = h;
+            }
+
+            /**
+             * Checks if this tile fits at the specified position in the image.
+             * That is, are the region filled by this tile entirely of the same color?
+             */
+            boolean fitsAt(final int x, final int y) {
+                Entry e = colorOf(img, palette, x, y);
+                if (e==null)        return false;
+                for (int xx=x; xx<x+w; xx++) {
+                    for (int yy=y; yy<y+h; yy++) {
+                        if (!Objects.equals(e,colorOf(img,palette,xx,yy)))
+                            return false;
+                    }
+                }
+                return true;
+            }
+
+            /**
+             * Places the tile at the specified position by remembering this in the 'filled' bitmap
+             */
+            void place(int x, int y) {
+                for (int xx=x; xx<x+w; xx++) {
+                    for (int yy=y; yy<y+h; yy++) {
+                        filled.set(xx+yy*area.width);
+                    }
+                }
+            }
+
+            /**
+             * String representation. Normalized so that 1x2 and 2x1 yields the same thing.
+             */
+            @Override
+            public String toString() {
+                return Math.max(w,h)+"x"+Math.min(w,h);
+            }
+        }
+        final List<Tile> tiles = Arrays.asList(new Tile(2,2),new Tile(2,1),new Tile(1,2),new Tile(1,1));
+
         for (int y=0; y<out.getHeight(); y++) {
             schematic.append("<tr>");
             for (int x=0; x<out.getWidth(); x++) {
-                Color c = new Color(img.getRGB(x+area.x,y+area.y),true);
+                Entry e = colorOf(img, palette, x, y);
 
-                if (c.getAlpha()<128) {
-                    // treat this as transparent
+                if (e==null) {// transparent
                     schematic.append("<td>　</td>");
                     continue;
                 }
-
-                c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
-
-                Entry e = dither.map(palette,c,x,y);
                 out.setRGB(x,y,e.rgb.getRGB());
 
                 Use v = used.get(e);
-                if (v==null) {
-                    used.put(e,v=new Use(e,used.size()));
+                if (v == null) {
+                    used.put(e, v = new Use(e, used.size()));
                     v.formatCellStyle(styles);
                 }
                 v.pixels++;
 
-                schematic.append("<td class=c" + v.index + ">").append(v.letter).append("</td>");
+                if (tileFill) {
+                    // tile fill, such as LEGO
+                    if (filled.get(x + y * area.width)) {
+                        // this pixel was already filled by tiles earlier
+                        continue;
+                    }
+                    for (Tile tile : tiles) {
+                        if (tile.fitsAt(x,y)) {
+                            tile.place(x,y);
+                            schematic.append(String.format("<td class=c%s colspan=%s rowspan=%s>%s</td>",
+                                    v.index, tile.w, tile.h, v.letter));
+                            v.incrementTile(tile.toString());
+                            break;
+                        }
+                    }
+                    // tiles should include 1x1, so something will match
+                } else {
+                    // single pixel fill, such as cross-stitching
+                    schematic.append(String.format("<td class=c%s>%s</td>",v.index, v.letter));
+                }
             }
 
             if (y==0) {
@@ -225,6 +298,27 @@ public class App {
             .replace("${colors}",colors);
 
         return new Result(template,used,out);
+    }
+
+    /**
+     * Color map one pixel of the image. (x,y) is coordinates in the output image.
+     */
+    private Entry colorOf(BufferedImage img, ColorPalette palette, int x, int y) {
+        int xx = x + area.x;
+        int yy = y + area.y;
+        if (xx>=img.getWidth() || yy>=img.getHeight())  return null;
+
+        Color c = new Color(img.getRGB(xx, yy),true);
+
+        if (c.getAlpha()<128) {
+            // treat this as transparent
+            return null;
+        }
+
+        // convert alpha to white
+        c = mix(c,c.getAlpha(), Color.WHITE,255-c.getAlpha());
+
+        return dither.map(palette,c,x,y);
     }
 
     /**

@@ -2,6 +2,9 @@ package org.kohsuke.xstich;
 
 import org.kohsuke.xstich.ColorPalette.Entry;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Use of a palette entry in a specific image.
  *
@@ -25,6 +28,11 @@ class Use implements Comparable<Use> {
      */
     final int index;
 
+    /**
+     * Used with {@linkplain App#tileFill the tile fill mode} to remember break downs of tiles we've used.
+     */
+    final Map<String,Integer> tiles = new HashMap<String, Integer>();
+
     Use(Entry color, int index) {
         this.color = color;
         this.letter = (SYMBOLS.length()>index) ? SYMBOLS.charAt(index) : ' ';
@@ -47,5 +55,10 @@ class Use implements Comparable<Use> {
     public void formatCellStyle(StringBuilder o) {
         o.append(String.format("#schematic.color TD.c%d { background-color:%s; }\n", index, toRGB()));
         o.append(String.format("#schematic.c%d TD.c%d { color:white; background-color: red; }\n", index, index));
+    }
+
+    public void incrementTile(String name) {
+        Integer c = tiles.get(name);
+        tiles.put(name, c==null ? 1 : c+1 );
     }
 }
