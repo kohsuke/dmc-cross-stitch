@@ -278,6 +278,13 @@ public class App {
             items.append(String.format("<div class=sample style='background-color:%s'></div>",use.toRGB()));
             items.append(String.format("<div class=letter>%c</div>", use.letter));
             items.append(String.format(" %4s %s (%d cnt)\n", use.color.dmcCode, use.color.name, use.pixels));
+            if (tileFill) {
+                items.append("<ul class=tiles>");
+                for (Map.Entry<String, Integer> tile : use.tiles.entrySet()) {
+                    items.append(String.format("<li>%s: %dpc", tile.getKey(), tile.getValue()));
+                }
+                items.append("</ul>");
+            }
             items.append("</li>");
 
             // specify black or white text color for each cell

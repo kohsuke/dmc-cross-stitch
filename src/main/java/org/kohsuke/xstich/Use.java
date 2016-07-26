@@ -2,8 +2,8 @@ package org.kohsuke.xstich;
 
 import org.kohsuke.xstich.ColorPalette.Entry;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Use of a palette entry in a specific image.
@@ -31,7 +31,7 @@ class Use implements Comparable<Use> {
     /**
      * Used with {@linkplain App#tileFill the tile fill mode} to remember break downs of tiles we've used.
      */
-    final Map<String,Integer> tiles = new HashMap<String, Integer>();
+    final Map<String,Integer> tiles = new TreeMap<String, Integer>();
 
     Use(Entry color, int index) {
         this.color = color;
