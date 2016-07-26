@@ -146,6 +146,9 @@ public class App {
         }
     }
 
+    /**
+     * Reduce image to the given color palette and produce color assignment.
+     */
     public Result apply(BufferedImage img, ColorPalette palette) throws IOException {
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
 
