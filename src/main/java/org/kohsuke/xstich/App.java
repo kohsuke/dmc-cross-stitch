@@ -54,6 +54,12 @@ public class App {
     @Option(name="-b",usage="Select Bayer matrix size from [2,3,4]")
     public int bayerSize = 4;
 
+    /**
+     * Area of ht image to process
+     */
+    @Option(name="-area",handler=RectangleHandler.class)
+    public Rectangle area;
+
 
     public OrderedDitheringAlgorithm dither = new NearestColor();
 
@@ -96,6 +102,7 @@ public class App {
 
     public void run() throws Exception {
         BufferedImage img = ImageIO.read(input);
+        if (area==null)     area = new Rectangle(img.getWidth(),img.getHeight());
         ColorPalette p = new ColorPalette(paletteName, getExcludedColorCodes());
         Result r = apply(img, p);
 
@@ -152,16 +159,16 @@ public class App {
     public Result apply(BufferedImage img, ColorPalette palette) throws IOException {
         Map<Entry,Use> used = new LinkedHashMap<Entry,Use>();
 
-        BufferedImage out = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        BufferedImage out = new BufferedImage(area.width, area.height, BufferedImage.TYPE_4BYTE_ABGR);
 
         String template = IOUtils.toString(App.class.getResourceAsStream("/output.html"));
 
         StringBuilder schematic = new StringBuilder();
         StringBuilder styles = new StringBuilder();
-        for (int y=0; y<img.getHeight(); y++) {
+        for (int y=0; y<out.getHeight(); y++) {
             schematic.append("<tr>");
-            for (int x=0; x<img.getWidth(); x++) {
-                Color c = new Color(img.getRGB(x,y),true);
+            for (int x=0; x<out.getWidth(); x++) {
+                Color c = new Color(img.getRGB(x+area.x,y+area.y),true);
 
                 if (c.getAlpha()<128) {
                     // treat this as transparent
@@ -185,7 +192,7 @@ public class App {
             }
 
             if (y==0) {
-                schematic.append("<td rowspan=").append(img.getHeight()).append(" style=\"border:none\">◀</td>");
+                schematic.append("<td rowspan=").append(out.getHeight()).append(" style=\"border:none\">◀</td>");
             }
 
             schematic.append("</tr>");
@@ -213,8 +220,8 @@ public class App {
         template = template.replace("${items}",items);
         template = template.replace("${schematic}", schematic);
         template = template.replace("${styles}",styles);
-        template = template.replace("${size}", String.format("%dw x %dh", img.getWidth(), img.getHeight()));
-        template = template.replace("${width}", String.valueOf(img.getWidth()));
+        template = template.replace("${size}", String.format("%dw x %dh", out.getWidth(), out.getHeight()));
+        template = template.replace("${width}", String.valueOf(out.getWidth()));
         template = template.replace("${cmdLine}",cmdLine);
         template = template.replace("${colors}",colors);
 
