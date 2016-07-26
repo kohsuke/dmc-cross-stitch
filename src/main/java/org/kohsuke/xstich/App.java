@@ -161,8 +161,6 @@ public class App {
 
         BufferedImage out = new BufferedImage(area.width, area.height, BufferedImage.TYPE_4BYTE_ABGR);
 
-        String template = IOUtils.toString(App.class.getResourceAsStream("/output.html"));
-
         StringBuilder schematic = new StringBuilder();
         StringBuilder styles = new StringBuilder();
         for (int y=0; y<out.getHeight(); y++) {
@@ -217,13 +215,14 @@ public class App {
             colors.append(use.color.dmcCode).append('\n');
         }
 
-        template = template.replace("${items}",items);
-        template = template.replace("${schematic}", schematic);
-        template = template.replace("${styles}",styles);
-        template = template.replace("${size}", String.format("%dw x %dh", out.getWidth(), out.getHeight()));
-        template = template.replace("${width}", String.valueOf(out.getWidth()));
-        template = template.replace("${cmdLine}",cmdLine);
-        template = template.replace("${colors}",colors);
+        String template = IOUtils.toString(App.class.getResourceAsStream("/output.html"))
+            .replace("${items}",items)
+            .replace("${schematic}", schematic)
+            .replace("${styles}",styles)
+            .replace("${size}", String.format("%dw x %dh", out.getWidth(), out.getHeight()))
+            .replace("${width}", String.valueOf(out.getWidth()))
+            .replace("${cmdLine}",cmdLine)
+            .replace("${colors}",colors);
 
         return new Result(template,used,out);
     }
