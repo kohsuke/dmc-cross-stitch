@@ -107,7 +107,9 @@ public class App {
 
     public void run() throws Exception {
         BufferedImage img = ImageIO.read(input);
-        if (area==null)     area = new Rectangle(img.getWidth(),img.getHeight());
+        Rectangle full = new Rectangle(img.getWidth(), img.getHeight());
+        if (area==null)     area = full;
+        else                area = area.intersection(full);
         ColorPalette p = new ColorPalette(paletteName, getExcludedColorCodes());
         Result r = apply(img, p);
 
@@ -311,11 +313,9 @@ public class App {
      * Color map one pixel of the image. (x,y) is coordinates in the output image.
      */
     private Entry colorOf(BufferedImage img, ColorPalette palette, int x, int y) {
-        int xx = x + area.x;
-        int yy = y + area.y;
-        if (xx>=img.getWidth() || yy>=img.getHeight())  return null;
+        if (x>=area.width || y>=area.height)  return null;
 
-        Color c = new Color(img.getRGB(xx, yy),true);
+        Color c = new Color(img.getRGB(x + area.x, y + area.y),true);
 
         if (c.getAlpha()<128) {
             // treat this as transparent
