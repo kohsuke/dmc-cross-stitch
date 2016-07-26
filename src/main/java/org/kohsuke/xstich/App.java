@@ -14,8 +14,11 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -154,7 +157,7 @@ public class App {
         public void write() throws IOException {
             ImageIO.write(image,"PNG",new File(input.getPath()+"-out.png"));
             File txt = new File(input.getPath() + ".html");
-            FileWriter w = new FileWriter(txt);
+            Writer w = new OutputStreamWriter(new FileOutputStream(txt),"UTF-8");
             w.write(html);
             w.close();
         }
