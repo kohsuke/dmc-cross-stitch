@@ -194,7 +194,7 @@ public class App {
                 if (e==null)        return false;
                 for (int xx=x; xx<x+w; xx++) {
                     for (int yy=y; yy<y+h; yy++) {
-                        if (!Objects.equals(e,colorOf(img,palette,xx,yy)))
+                        if (filled.get(xx+yy*area.width) || !Objects.equals(e,colorOf(img,palette,xx,yy)))
                             return false;
                     }
                 }
@@ -220,7 +220,7 @@ public class App {
                 return Math.max(w,h)+"x"+Math.min(w,h);
             }
         }
-        final List<Tile> tiles = Arrays.asList(new Tile(2,2),new Tile(2,1),new Tile(1,2),new Tile(1,1));
+        final List<Tile> tiles = Arrays.asList(new Tile(2,2),/*new Tile(2,1),new Tile(1,2),*/new Tile(1,1));
 
         for (int y=0; y<out.getHeight(); y++) {
             schematic.append("<tr>");
