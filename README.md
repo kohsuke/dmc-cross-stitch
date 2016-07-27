@@ -47,11 +47,29 @@ between the `-2e` option and the `-e` option; the former replaces the specified 
 in the current design, while the latter replaces the specified color by another color available in the material.
 
 ## (-tk)
+Use a block dither algorithm, which tends to produce a block pattern in the output like the following:
+
+![block dither](https://upload.wikimedia.org/wikipedia/commons/e/ef/Michelangelo%27s_David_-_Bayer.png)
+
+This tend to work well when creating a large mosaic with materials of limited color options, such as LEGO. 
 
 ## (-ctk)
+Combine block dither algorithm (see above) with the default "nearest color" algorithm by
+applying them selectively to different regions of the same image.
+
+This option takes another image as an argument and use that as the mask pattern like this: `-ctk mask.png`
+
+The mask image should have transparent pixels and opaque pixels, and should be of the same size as
+the main image. The part of the main image specified by opaque colors in the mask image will receive
+the block dither algorithm, while others get the "nearest color" algorithm.
+
+I wrote this mode to deal with video game graphics images that have clear border pixels. I wanted
+those to be mapped to one color to get a crisp line, while getting a good color match in other areas
+through the block dither algorithm.
+
 
 ## Selecting dither block size (-b)
-Thomas Knoll dither algorithm acts on a block of pixels at a time (2x2, 3x3, 4x4, ...)
+Block dither algorithm acts on a block of pixels at a time (2x2, 3x3, 4x4, ...)
 This algorithm selects the block size. For example, `-b 2` would select 2x2 block.
 
 Larger block size spreads colors among larger number of pixels, which is normally not practical for sizes of
