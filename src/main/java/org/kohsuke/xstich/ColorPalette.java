@@ -38,9 +38,35 @@ public class ColorPalette {
          * Computes CIE color distance.
          */
         public double distance(ColorCIELab that) {
+            // CIE 76
+            /*
             return sq(this.cie.L-that.L)
                 +  sq(this.cie.a-that.a)
                 +  sq(this.cie.b-that.b);
+            */
+
+            // CIE 94
+            ColorCIELab x = cie;
+            ColorCIELab y = that;
+
+            double k_L = 1.0;
+            double k1 = 0.045;
+            double k2 = 0.015;
+
+            double c1 = Math.sqrt(sq(x.a)+sq(x.b));
+            double c2 = Math.sqrt(sq(y.a)+sq(y.b));
+            double delta_L = x.L - y.L;
+            double delta_a = x.a - y.a;
+            double delta_b = x.b - y.b;
+            double delta_C = c1-c2;
+            double delta_H = Math.sqrt(sq(delta_a)+sq(delta_b)-sq(delta_C));
+            double S_L = 1;
+            double S_C = 1.0 + k1*c1;
+            double S_H = 1.0 + k2*c1;
+
+            double k_C= 1.0, k_H=1.0; // ???
+
+            return Math.sqrt(sq(delta_L/(k_L*S_L)) + sq(delta_C/(k_C*S_C)) + sq(delta_H/(k_H*S_H)));
         }
 
         public double getLumacity() {
